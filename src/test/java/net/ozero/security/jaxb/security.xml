@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<security>
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role>USER</role>
+        </auth-constraint>
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/login</url-pattern>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role>GUEST</role>
+        </auth-constraint>
+    </security-constraint>
+</security>
