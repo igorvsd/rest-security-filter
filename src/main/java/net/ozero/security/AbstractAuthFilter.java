@@ -26,13 +26,13 @@ import org.apache.commons.lang.StringUtils;
  * Date: 11/26/11
  * Time: 4:24 AM
  */
-public abstract class AuthFilter implements Filter {
+public abstract class AbstractAuthFilter implements Filter {
 
     private static final String GUEST = "GUEST";
     private SecurityJ securityConfig = new SecurityJ();
 
 
-    public abstract boolean authUser(String login, String password);
+    public abstract boolean authUser(String username, String password);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
