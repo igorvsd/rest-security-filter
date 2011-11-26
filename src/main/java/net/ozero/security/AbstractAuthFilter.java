@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 public abstract class AbstractAuthFilter implements Filter {
 
     private static final String GUEST = "GUEST";
+    private static final String SECURITY_XML = "/security.xml";
     private SecurityJ securityConfig = new SecurityJ();
 
 
@@ -36,7 +37,7 @@ public abstract class AbstractAuthFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        InputStream is = getClass().getClassLoader().getResourceAsStream("/WEB-INF/classes/security.xml");
+        InputStream is = getClass().getClassLoader().getResourceAsStream(SECURITY_XML);
         try {
             securityConfig = (SecurityJ) new JAXBContextWrapper().unmarshalSecurityConfig(is);
         } catch (JAXBException e) {
@@ -59,7 +60,7 @@ public abstract class AbstractAuthFilter implements Filter {
                 for (String url : w.getUrlPatterns()) {
                     if (
                             (
-                                    (url.endsWith("*") && url.startsWith(path)) ||
+                                    (url.endsWith("*") && path.startsWith(url.substring(0, url.length() - 1))) ||
                                             (!url.endsWith("*") && url.equals(path))
                             ) && w.getHttpMethods().contains(method)
                             ) {
@@ -74,15 +75,16 @@ public abstract class AbstractAuthFilter implements Filter {
             return;
         }
 
-        final String auth = httpRequest.getHeader("Authorization");
+        final String auth = httpRequest.getHeader("authorization");
         if (auth != null) {
 
             final int index = auth.indexOf(' ');
             if (index > 0) {
                 final String[] credentials = StringUtils.split(new String(Base64.decodeBase64(auth.substring(index).getBytes("UTF-8"))), ':');
                 if (credentials.length == 2) {
-                    boolean hasAccess = authUser(credentials[0], credentials[1]);
+                    boolean hasAccess = !credentials[0].equals("ANONYMOUS") && authUser(credentials[0], credentials[1]);
                     if (hasAccess) {
+                        httpRequest.setAttribute("username", credentials[0]);
                         filterChain.doFilter(httpRequest, httpResponse);
                         return;
                     }
@@ -90,7 +92,7 @@ public abstract class AbstractAuthFilter implements Filter {
             }
         }
 
-        httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
+        httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Override
