@@ -13,12 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
+
 import net.ozero.security.jaxb.JAXBContextWrapper;
 import net.ozero.security.jaxb.SecurityConstraintJ;
 import net.ozero.security.jaxb.SecurityJ;
 import net.ozero.security.jaxb.WebResourceCollectionJ;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Created by Vim.
@@ -51,7 +52,7 @@ public abstract class AbstractAuthFilter implements Filter {
         final HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
         final HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-        String path = httpRequest.getPathInfo();
+        String path = httpRequest.getServletPath();
         String method = httpRequest.getMethod();
 
         String authRole = GUEST;
